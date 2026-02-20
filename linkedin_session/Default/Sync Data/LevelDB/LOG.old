@@ -1,2 +1,3 @@
-2026/02/20-14:41:35.644 6a68 Creating DB C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Sync Data\LevelDB since it was missing.
-2026/02/20-14:41:35.749 6a68 Reusing MANIFEST C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Sync Data\LevelDB/MANIFEST-000001
+2026/02/20-15:32:10.798 1fac Reusing MANIFEST C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Sync Data\LevelDB/MANIFEST-000001
+2026/02/20-15:32:10.799 1fac Recovering log #3
+2026/02/20-15:32:10.800 1fac Reusing old log C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Sync Data\LevelDB/000003.log 

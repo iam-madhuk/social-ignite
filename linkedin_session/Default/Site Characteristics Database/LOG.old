@@ -1,2 +1,3 @@
-2026/02/20-14:41:35.656 5348 Creating DB C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Site Characteristics Database since it was missing.
-2026/02/20-14:41:35.759 5348 Reusing MANIFEST C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Site Characteristics Database/MANIFEST-000001
+2026/02/20-15:32:10.793 8770 Reusing MANIFEST C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Site Characteristics Database/MANIFEST-000001
+2026/02/20-15:32:10.812 8770 Recovering log #3
+2026/02/20-15:32:10.813 8770 Reusing old log C:\Users\madhukumari\OneDrive - Nagarro\Documents\linkdin\linkedin_session\Default\Site Characteristics Database/000003.log 
