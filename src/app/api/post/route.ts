@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import { postToLinkedIn } from '@/../lib/linkedin_poster';
 
 export async function POST(request: Request) {
-    const { text } = await request.json();
+    const { text, mediaPath, mediaType, isArticle } = await request.json();
 
-    if (!text) {
-        return NextResponse.json({ error: 'Text content is required' }, { status: 400 });
+    if (!text && !mediaPath) {
+        return NextResponse.json({ error: 'Text or media is required' }, { status: 400 });
     }
 
     try {
-        const result = await postToLinkedIn(text);
+        const result = await postToLinkedIn(text, { mediaPath, mediaType, isArticle });
         if (result.success) {
             return NextResponse.json({ message: 'Posted successfully!' });
         } else {
