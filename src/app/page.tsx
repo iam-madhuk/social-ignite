@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Send, Settings, CheckCircle, AlertCircle, Loader2, Image as ImageIcon, Video, FileText, BookOpen, X } from 'lucide-react';
 
 export default function Home() {
   const [postText, setPostText] = useState('');
   const [loading, setLoading] = useState(false);
   const [isArticle, setIsArticle] = useState(false);
-  const [mediaPath, setMediaPath] = useState('');
-  const [mediaType, setMediaType] = useState<'image' | 'video' | 'document' | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({
     type: null,
     message: '',
@@ -41,26 +41,28 @@ export default function Home() {
   };
 
   const handlePost = async () => {
-    if (!postText.trim()) return;
+    if (!postText.trim() && !selectedFile) return;
     setLoading(true);
-    setStatus({ type: null, message: 'Posting to LinkedIn...' });
+    setStatus({ type: null, message: 'Igniting your post...' });
+
+    const formData = new FormData();
+    formData.append('text', postText);
+    formData.append('isArticle', String(isArticle));
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
 
     try {
       const res = await fetch('/api/post', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: postText,
-          mediaPath: mediaPath || null,
-          mediaType: mediaType,
-          isArticle: isArticle
-        }),
+        body: formData,
       });
 
       const data = await res.json();
       if (res.ok) {
-        setStatus({ type: 'success', message: 'Successfully posted to LinkedIn!' });
+        setStatus({ type: 'success', message: 'Successfully ignited your post!' });
         setPostText('');
+        setSelectedFile(null);
       } else {
         setStatus({ type: 'error', message: data.error || 'Failed to post.' });
       }
@@ -122,52 +124,73 @@ export default function Home() {
 
           {!isArticle && (
             <div className="space-y-2">
-              <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Add Media (Local Path)</label>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={mediaPath}
-                    onChange={(e) => setMediaPath(e.target.value)}
-                    placeholder="C:\path\to\your\file.jpg"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-3 pr-10 text-sm text-slate-300 placeholder:text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500"
-                  />
-                  {mediaPath && (
+              <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">ATTACH MEDIA</label>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setSelectedFile(file);
+                }}
+                className="hidden"
+                accept="image/*,video/*,.pdf,.doc,.docx"
+              />
+
+              <div className="flex flex-col gap-3">
+                {selectedFile ? (
+                  <div className="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg p-3">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-2 bg-orange-950/20 rounded-lg text-orange-500">
+                        {selectedFile.type.includes('image') ? <ImageIcon size={20} /> :
+                          selectedFile.type.includes('video') ? <Video size={20} /> : <FileText size={20} />}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-sm font-medium text-slate-200 truncate">{selectedFile.name}</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-tighter">
+                          {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • {selectedFile.type.split('/')[1] || 'FILE'}
+                        </p>
+                      </div>
+                    </div>
                     <button
-                      onClick={() => { setMediaPath(''); setMediaType(null); }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400"
+                      onClick={() => setSelectedFile(null)}
+                      className="p-1.5 text-slate-600 hover:text-slate-400 hover:bg-slate-800 rounded-md transition-colors"
                     >
-                      <X size={16} />
+                      <X size={18} />
                     </button>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-4 px-1">
-                <button
-                  onClick={() => setMediaType('image')}
-                  className={`flex items-center gap-2 text-xs transition-colors ${mediaType === 'image' ? 'text-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  <ImageIcon size={14} /> Image
-                </button>
-                <button
-                  onClick={() => setMediaType('video')}
-                  className={`flex items-center gap-2 text-xs transition-colors ${mediaType === 'video' ? 'text-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  <Video size={14} /> Video
-                </button>
-                <button
-                  onClick={() => setMediaType('document')}
-                  className={`flex items-center gap-2 text-xs transition-colors ${mediaType === 'document' ? 'text-orange-500' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  <FileText size={14} /> Doc/PDF
-                </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-3">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-950 border border-slate-800 border-dashed rounded-xl text-slate-500 hover:text-orange-500 hover:border-orange-500/50 hover:bg-orange-950/5 transition-all group"
+                    >
+                      <ImageIcon size={24} className="group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-medium tracking-wide">IMAGE</span>
+                    </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-950 border border-slate-800 border-dashed rounded-xl text-slate-500 hover:text-orange-500 hover:border-orange-500/50 hover:bg-orange-950/5 transition-all group"
+                    >
+                      <Video size={24} className="group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-medium tracking-wide">VIDEO</span>
+                    </button>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex flex-col items-center justify-center gap-2 p-4 bg-slate-950 border border-slate-800 border-dashed rounded-xl text-slate-500 hover:text-orange-500 hover:border-orange-500/50 hover:bg-orange-950/5 transition-all group"
+                    >
+                      <FileText size={24} className="group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-medium tracking-wide">DOC / PDF</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           <button
             onClick={handlePost}
-            disabled={loading || (!postText.trim() && !mediaPath)}
+            disabled={loading || (!postText.trim() && !selectedFile)}
             className="w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-orange-950/20 mt-4"
           >
             {loading ? (

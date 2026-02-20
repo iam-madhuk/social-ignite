@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Social-Ignite
+/linkedin_session/
+/tmp/
+debug_*.png
